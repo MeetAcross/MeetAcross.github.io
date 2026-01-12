@@ -33,6 +33,12 @@ A powerful, intuitive web application that helps you find the perfect meeting ti
   - Early/late hours (8-9 AM, 5-7 PM)
   - Night hours (avoid scheduling during sleep time)
   - Weekend detection and penalties
+- **Direct Meeting Platform Integration**: 
+  - 📹 **Google Meet** - Create meetings with OAuth authentication
+  - 💼 **Microsoft Teams** - Create Teams meetings directly
+  - 🎥 **Zoom** - Schedule Zoom meetings with one click
+  - Organizer information capture (name, email, timezone)
+  - Demo mode for testing without OAuth setup
 - **Calendar Integration**: 
   - Google Calendar direct link generation
   - ICS file download for any calendar app (Outlook, Apple Calendar, etc.)
@@ -194,10 +200,18 @@ The algorithm:
 
 ## 📚 Usage Instructions
 
+### Setting Up Meeting Platforms
+
+For direct meeting creation with Google Meet, Microsoft Teams, or Zoom, see our comprehensive [Meeting Platform Setup Guide](MEETING_PLATFORM_SETUP.md).
+
+**Quick Setup Options:**
+- **Demo Mode**: Test the interface without OAuth credentials
+- **Production Mode**: Configure OAuth for real meeting creation
+
 ### Adding Attendees
 
 1. **Enter Name**: Type the attendee's name (e.g., "John Smith")
-2. **Select Timezone**: Choose from 30+ major timezones
+2. **Select Timezone**: Choose from 418+ timezones worldwide
 3. **Click "Add Attendee"**: The attendee appears in the list below
 4. **Repeat**: Add as many attendees as needed
 
@@ -751,16 +765,18 @@ SOFTWARE.
 
 ## 🗺️ Roadmap
 
-### Version 1.1 (Completed)
-- [x] 418 comprehensive global timezones
-- [x] MeetAcross branding and logo
-- [x] Team templates (save common groups)
-- [x] Export to CSV
-- [x] Dark mode
+### Version 1.2 (Current - Meeting Platform Integration)
+- [x] Direct meeting creation on Google Meet
+- [x] Direct meeting creation on Microsoft Teams
+- [x] Direct meeting creation on Zoom
+- [x] Organizer information fields (name, email, timezone)
+- [x] OAuth2 authentication flow
+- [x] Demo mode for testing
+- [x] Setup documentation
 
-### Version 1.2 (Planned)
+### Version 1.3 (Planned)
 - [ ] Recurring meeting support
-- [ ] More calendar integrations (Outlook, Apple)
+- [ ] More calendar integrations (Outlook Calendar, Apple Calendar)
 - [ ] Multiple language support
 - [ ] Mobile app (PWA)
 - [ ] Meeting preferences per attendee
@@ -772,6 +788,17 @@ SOFTWARE.
 - [ ] Advanced analytics
 
 ## 📈 Changelog
+
+### Version 1.2.0 (2026-01-12)
+- Added direct meeting platform integration
+- Integrated Google Meet with OAuth2 authentication
+- Integrated Microsoft Teams with OAuth2 authentication
+- Integrated Zoom with OAuth2 authentication
+- Added organizer information capture (name, email, timezone)
+- Added demo mode for testing without OAuth credentials
+- Created comprehensive setup documentation
+- Enhanced UI with platform connection cards
+- Auto-detect and save organizer timezone
 
 ### Version 1.1.0 (2026-01-12)
 - Added comprehensive global timezone support (418 timezones)
