@@ -229,6 +229,80 @@
         .fab:hover {
             transform: scale(1.1);
         }
+        
+        /* Autocomplete timezone dropdown */
+        .timezone-autocomplete {
+            position: relative;
+        }
+        
+        .timezone-autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 0.5rem 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .timezone-autocomplete-dropdown.active {
+            display: block;
+        }
+        
+        .timezone-autocomplete-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .timezone-autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        
+        .timezone-autocomplete-item:hover,
+        .timezone-autocomplete-item.selected {
+            background-color: #eef2ff;
+        }
+        
+        .timezone-autocomplete-item-name {
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .timezone-autocomplete-item-details {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.125rem;
+        }
+        
+        .dark .timezone-autocomplete-dropdown {
+            background-color: #1e293b;
+            border-color: #475569;
+        }
+        
+        .dark .timezone-autocomplete-item {
+            border-bottom-color: #334155;
+        }
+        
+        .dark .timezone-autocomplete-item:hover,
+        .dark .timezone-autocomplete-item.selected {
+            background-color: #334155;
+        }
+        
+        .dark .timezone-autocomplete-item-name {
+            color: #e2e8f0;
+        }
+        
+        .dark .timezone-autocomplete-item-details {
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4">
@@ -324,15 +398,17 @@
                         maxlength="50"
                     >
                 </div>
-                <div>
+                <div class="timezone-autocomplete">
                     <label for="attendeeTimezone" class="block text-sm font-medium text-gray-700 mb-1">Time Zone</label>
-                    <select 
+                    <input 
+                        type="text" 
                         id="attendeeTimezone" 
+                        placeholder="Search time zone by city or country..."
                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         aria-label="Attendee timezone"
+                        autocomplete="off"
                     >
-                        <option value="">Select Time Zone</option>
-                    </select>
+                    <div id="attendeeTimezoneDropdown" class="timezone-autocomplete-dropdown"></div>
                 </div>
                 <div class="flex items-end">
                     <button 
@@ -484,14 +560,18 @@
                         </div>
                         <div>
                             <label for="organizerTimezone" class="block text-sm font-medium text-gray-700 mb-1">Your Timezone *</label>
-                            <select 
-                                id="organizerTimezone" 
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
-                                aria-label="Organizer timezone"
-                                required
-                            >
-                                <option value="">Select Timezone</option>
-                            </select>
+                            <div class="timezone-autocomplete">
+                                <input 
+                                    type="text" 
+                                    id="organizerTimezone" 
+                                    placeholder="Search time zone by city or country..."
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                                    aria-label="Organizer timezone"
+                                    autocomplete="off"
+                                    required
+                                >
+                                <div id="organizerTimezoneDropdown" class="timezone-autocomplete-dropdown"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -857,24 +937,28 @@
                         >
                     </div>
                     
-                    <div>
+                    <div class="timezone-autocomplete">
                         <label for="converterFromTz" class="block text-sm font-medium text-gray-700 mb-1">From Timezone</label>
-                        <select 
+                        <input 
+                            type="text" 
                             id="converterFromTz" 
+                            placeholder="Search time zone by city or country..."
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                            autocomplete="off"
                         >
-                            <option value="">Select Timezone</option>
-                        </select>
+                        <div id="converterFromTzDropdown" class="timezone-autocomplete-dropdown"></div>
                     </div>
                     
-                    <div>
+                    <div class="timezone-autocomplete">
                         <label for="converterToTz" class="block text-sm font-medium text-gray-700 mb-1">To Timezone</label>
-                        <select 
+                        <input 
+                            type="text" 
                             id="converterToTz" 
+                            placeholder="Search time zone by city or country..."
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                            autocomplete="off"
                         >
-                            <option value="">Select Timezone</option>
-                        </select>
+                        <div id="converterToTzDropdown" class="timezone-autocomplete-dropdown"></div>
                     </div>
                     
                     <button 
@@ -957,9 +1041,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            populateTimezones();
-            populateOrganizerTimezone();
-            populateConverterTimezones();
+            initAllTimezoneAutocompletes();
             setDefaultDate();
             setDefaultConverterTime();
             loadDarkModePreference();
@@ -1279,8 +1361,8 @@
         
         function convertTime() {
             const timeInput = document.getElementById('converterTime').value;
-            const fromTz = document.getElementById('converterFromTz').value;
-            const toTz = document.getElementById('converterToTz').value;
+            const fromTz = getSelectedTimezone('converterFromTz');
+            const toTz = getSelectedTimezone('converterToTz');
             
             if (!timeInput || !fromTz || !toTz) {
                 showToast('Please fill all fields', 'error');
@@ -1542,8 +1624,13 @@
         }
 
         // Populate timezone dropdown
-        function populateTimezones() {
-            const timezones = [
+        // ============================================================
+        // TIMEZONE AUTOCOMPLETE FUNCTIONALITY
+        // ============================================================
+        
+        // Enhanced timezone data with country names and GMT offsets
+        function getTimezoneList() {
+            return [
                 'Africa/Abidjan', 'Africa/Accra', 'Africa/Addis_Ababa', 'Africa/Algiers', 'Africa/Asmera',
                 'Africa/Bamako', 'Africa/Bangui', 'Africa/Banjul', 'Africa/Bissau', 'Africa/Blantyre',
                 'Africa/Brazzaville', 'Africa/Bujumbura', 'Africa/Cairo', 'Africa/Casablanca', 'Africa/Ceuta',
@@ -1639,14 +1726,223 @@
                 'Pacific/Rarotonga', 'Pacific/Saipan', 'Pacific/Tahiti', 'Pacific/Tarawa', 'Pacific/Tongatapu',
                 'Pacific/Truk', 'Pacific/Wake', 'Pacific/Wallis'
             ];
-
-            const select = document.getElementById('attendeeTimezone');
-            timezones.forEach(tz => {
-                const option = document.createElement('option');
-                option.value = tz;
-                option.textContent = tz.replace(/_/g, ' ');
-                select.appendChild(option);
+        }
+        
+        // Get GMT offset for a timezone
+        function getTimezoneOffset(timezone) {
+            try {
+                const now = new Date();
+                const tzString = now.toLocaleString('en-US', { timeZone: timezone, timeZoneName: 'short' });
+                const match = tzString.match(/GMT([+-]\d+)/);
+                if (match) return match[1];
+                
+                // Alternative: calculate offset manually
+                const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+                const tzDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+                const offset = (tzDate - utcDate) / (1000 * 60 * 60);
+                return offset >= 0 ? `+${offset}` : `${offset}`;
+            } catch (e) {
+                return '';
+            }
+        }
+        
+        // Get friendly name for timezone (city and region)
+        function getTimezoneFriendlyName(timezone) {
+            const parts = timezone.split('/');
+            if (parts.length > 1) {
+                const region = parts[0];
+                const city = parts[parts.length - 1].replace(/_/g, ' ');
+                return { region, city, full: `${city}, ${region}` };
+            }
+            return { region: '', city: timezone.replace(/_/g, ' '), full: timezone.replace(/_/g, ' ') };
+        }
+        
+        // Timezone autocomplete state
+        const autocompleteState = {};
+        
+        // Initialize timezone autocomplete for an input
+        function initTimezoneAutocomplete(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            const timezones = getTimezoneList();
+            
+            // Store selected value
+            autocompleteState[inputId] = { value: '', displayText: '' };
+            
+            let selectedIndex = -1;
+            let filteredTimezones = [];
+            
+            // Filter and display suggestions
+            function showSuggestions(query) {
+                query = query.toLowerCase().trim();
+                
+                if (!query) {
+                    dropdown.classList.remove('active');
+                    return;
+                }
+                
+                // Filter timezones
+                filteredTimezones = timezones.filter(tz => {
+                    const friendly = getTimezoneFriendlyName(tz);
+                    const tzLower = tz.toLowerCase();
+                    const cityLower = friendly.city.toLowerCase();
+                    const regionLower = friendly.region.toLowerCase();
+                    
+                    return tzLower.includes(query) || 
+                           cityLower.includes(query) || 
+                           regionLower.includes(query);
+                }).slice(0, 50); // Limit to 50 results for performance
+                
+                // Display suggestions
+                if (filteredTimezones.length === 0) {
+                    dropdown.innerHTML = '<div class="timezone-autocomplete-item" style="color: #9ca3af;">No matching timezones found</div>';
+                    dropdown.classList.add('active');
+                    return;
+                }
+                
+                dropdown.innerHTML = filteredTimezones.map((tz, index) => {
+                    const friendly = getTimezoneFriendlyName(tz);
+                    const offset = getTimezoneOffset(tz);
+                    return `
+                        <div class="timezone-autocomplete-item" data-index="${index}" data-value="${tz}">
+                            <div class="timezone-autocomplete-item-name">${friendly.city}</div>
+                            <div class="timezone-autocomplete-item-details">${friendly.region}${offset ? ' • GMT' + offset : ''}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                dropdown.classList.add('active');
+                selectedIndex = -1;
+            }
+            
+            // Select a timezone
+            function selectTimezone(timezone) {
+                const friendly = getTimezoneFriendlyName(timezone);
+                autocompleteState[inputId].value = timezone;
+                autocompleteState[inputId].displayText = friendly.full;
+                input.value = friendly.full;
+                input.dataset.timezone = timezone;
+                dropdown.classList.remove('active');
+                selectedIndex = -1;
+            }
+            
+            // Input event - show suggestions
+            input.addEventListener('input', function(e) {
+                showSuggestions(e.target.value);
             });
+            
+            // Focus event - show suggestions if there's text
+            input.addEventListener('focus', function(e) {
+                if (e.target.value) {
+                    showSuggestions(e.target.value);
+                }
+            });
+            
+            // Keyboard navigation
+            input.addEventListener('keydown', function(e) {
+                const items = dropdown.querySelectorAll('.timezone-autocomplete-item[data-value]');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateSelection(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateSelection(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && items[selectedIndex]) {
+                        const timezone = items[selectedIndex].dataset.value;
+                        selectTimezone(timezone);
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('active');
+                    selectedIndex = -1;
+                }
+            });
+            
+            // Update visual selection
+            function updateSelection(items) {
+                items.forEach((item, index) => {
+                    if (index === selectedIndex) {
+                        item.classList.add('selected');
+                        item.scrollIntoView({ block: 'nearest' });
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+            
+            // Click on suggestion
+            dropdown.addEventListener('click', function(e) {
+                const item = e.target.closest('.timezone-autocomplete-item[data-value]');
+                if (item) {
+                    const timezone = item.dataset.value;
+                    selectTimezone(timezone);
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                    selectedIndex = -1;
+                }
+            });
+        }
+        
+        // Get selected timezone value from autocomplete input
+        function getSelectedTimezone(inputId) {
+            const input = document.getElementById(inputId);
+            return input.dataset.timezone || autocompleteState[inputId]?.value || '';
+        }
+        
+        // Set timezone value programmatically
+        function setTimezoneValue(inputId, timezone) {
+            const input = document.getElementById(inputId);
+            if (!timezone) {
+                input.value = '';
+                input.dataset.timezone = '';
+                autocompleteState[inputId] = { value: '', displayText: '' };
+                return;
+            }
+            
+            const friendly = getTimezoneFriendlyName(timezone);
+            input.value = friendly.full;
+            input.dataset.timezone = timezone;
+            autocompleteState[inputId] = { value: timezone, displayText: friendly.full };
+        }
+        
+        // Initialize all timezone autocompletes
+        function initAllTimezoneAutocompletes() {
+            initTimezoneAutocomplete('attendeeTimezone', 'attendeeTimezoneDropdown');
+            initTimezoneAutocomplete('organizerTimezone', 'organizerTimezoneDropdown');
+            initTimezoneAutocomplete('converterFromTz', 'converterFromTzDropdown');
+            initTimezoneAutocomplete('converterToTz', 'converterToTzDropdown');
+            
+            // Auto-detect and set user's timezone for converter
+            try {
+                const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                if (userTz) {
+                    setTimezoneValue('converterFromTz', userTz);
+                    setTimezoneValue('organizerTimezone', userTz);
+                }
+            } catch (e) {
+                console.log('Could not auto-detect timezone');
+            }
+        }
+        
+        function populateTimezones() {
+            // No longer needed - using autocomplete
+        }
+
+        function populateOrganizerTimezone() {
+            // No longer needed - using autocomplete
+        }
+
+        function populateConverterTimezones() {
+            // No longer needed - using autocomplete
         }
 
         // Set default date to today
@@ -1665,7 +1961,7 @@
         // Add attendee
         function addAttendee() {
             const name = document.getElementById('attendeeName').value.trim();
-            const timezone = document.getElementById('attendeeTimezone').value;
+            const timezone = getSelectedTimezone('attendeeTimezone');
 
             if (!name) {
                 showToast('Please enter attendee name', 'error');
@@ -1705,7 +2001,7 @@
             
             // Clear inputs
             document.getElementById('attendeeName').value = '';
-            document.getElementById('attendeeTimezone').value = '';
+            setTimezoneValue('attendeeTimezone', '');
             document.getElementById('attendeeName').focus();
             
             showToast(`✓ Added ${name}`, 'success');
@@ -2382,22 +2678,35 @@ END:VCALENDAR`;
                     const info = JSON.parse(savedInfo);
                     if (info.name) document.getElementById('organizerName').value = info.name;
                     if (info.email) document.getElementById('organizerEmail').value = info.email;
-                    if (info.timezone) document.getElementById('organizerTimezone').value = info.timezone;
+                    if (info.timezone) setTimezoneValue('organizerTimezone', info.timezone);
                 } catch (e) {
                     console.log('Could not load saved organizer info');
                 }
             }
 
             // Save organizer info when fields change
-            ['organizerName', 'organizerEmail', 'organizerTimezone'].forEach(id => {
+            ['organizerName', 'organizerEmail'].forEach(id => {
                 document.getElementById(id).addEventListener('change', function() {
                     const info = {
                         name: document.getElementById('organizerName').value,
                         email: document.getElementById('organizerEmail').value,
-                        timezone: document.getElementById('organizerTimezone').value
+                        timezone: getSelectedTimezone('organizerTimezone')
                     };
                     localStorage.setItem('organizerInfo', JSON.stringify(info));
                 });
+            });
+            
+            // Special handling for timezone autocomplete
+            document.getElementById('organizerTimezone').addEventListener('input', function() {
+                // Only save if a valid timezone is selected
+                if (getSelectedTimezone('organizerTimezone')) {
+                    const info = {
+                        name: document.getElementById('organizerName').value,
+                        email: document.getElementById('organizerEmail').value,
+                        timezone: getSelectedTimezone('organizerTimezone')
+                    };
+                    localStorage.setItem('organizerInfo', JSON.stringify(info));
+                }
             });
         }
 
@@ -2405,7 +2714,7 @@ END:VCALENDAR`;
         function validateOrganizerInfo() {
             const name = document.getElementById('organizerName').value.trim();
             const email = document.getElementById('organizerEmail').value.trim();
-            const timezone = document.getElementById('organizerTimezone').value;
+            const timezone = getSelectedTimezone('organizerTimezone');
 
             if (!name) {
                 showToast('Please enter your name', 'error');
@@ -2706,11 +3015,11 @@ END:VCALENDAR`;
                     description: description + `\n\nOrganizer: ${organizerName} (${organizerEmail})\nAttendees: ${attendees.map(a => a.name).join(', ')}`,
                     start: {
                         dateTime: startDate.toISOString(),
-                        timeZone: document.getElementById('organizerTimezone').value
+                        timeZone: getSelectedTimezone('organizerTimezone')
                     },
                     end: {
                         dateTime: endDate.toISOString(),
-                        timeZone: document.getElementById('organizerTimezone').value
+                        timeZone: getSelectedTimezone('organizerTimezone')
                     },
                     attendees: [{ email: organizerEmail }, ...attendeesList],
                     conferenceData: {
@@ -2899,11 +3208,11 @@ END:VCALENDAR`;
                     },
                     start: {
                         dateTime: startDate.toISOString(),
-                        timeZone: document.getElementById('organizerTimezone').value
+                        timeZone: getSelectedTimezone('organizerTimezone')
                     },
                     end: {
                         dateTime: endDate.toISOString(),
-                        timeZone: document.getElementById('organizerTimezone').value
+                        timeZone: getSelectedTimezone('organizerTimezone')
                     },
                     attendees: attendeesList,
                     isOnlineMeeting: true,
@@ -3040,7 +3349,7 @@ END:VCALENDAR`;
 
             const organizerName = document.getElementById('organizerName').value.trim();
             const organizerEmail = document.getElementById('organizerEmail').value.trim();
-            const organizerTimezone = document.getElementById('organizerTimezone').value;
+            const organizerTimezone = getSelectedTimezone('organizerTimezone');
 
             showToast('Creating Zoom meeting...', 'info');
 
