@@ -338,9 +338,14 @@
                         placeholder="Type to search timezone (e.g., New York, Tokyo, London)"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         aria-label="Attendee timezone"
+                        role="combobox"
+                        aria-expanded="false"
+                        aria-haspopup="listbox"
+                        aria-owns="attendeeTimezoneDropdown"
+                        aria-autocomplete="list"
                         autocomplete="off"
                     >
-                    <div id="attendeeTimezoneDropdown" class="autocomplete-dropdown"></div>
+                    <div id="attendeeTimezoneDropdown" class="autocomplete-dropdown" role="listbox" aria-label="Timezone suggestions"></div>
                 </div>
                 <div class="flex items-end">
                     <button 
@@ -498,10 +503,15 @@
                                 placeholder="Type to search timezone (e.g., New York, Tokyo, London)"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
                                 aria-label="Organizer timezone"
+                                role="combobox"
+                                aria-expanded="false"
+                                aria-haspopup="listbox"
+                                aria-owns="organizerTimezoneDropdown"
+                                aria-autocomplete="list"
                                 autocomplete="off"
                                 required
                             >
-                            <div id="organizerTimezoneDropdown" class="autocomplete-dropdown"></div>
+                            <div id="organizerTimezoneDropdown" class="autocomplete-dropdown" role="listbox" aria-label="Timezone suggestions"></div>
                         </div>
                     </div>
                 </div>
@@ -895,6 +905,7 @@
                 
                 if (query.length === 0) {
                     dropdown.classList.remove('show');
+                    input.setAttribute('aria-expanded', 'false');
                     return;
                 }
                 
@@ -908,12 +919,13 @@
                 // Display results
                 if (matches.length > 0) {
                     dropdown.innerHTML = matches.slice(0, 10).map((tz, index) => `
-                        <div class="autocomplete-item" data-value="${tz.value}" data-index="${index}">
+                        <div class="autocomplete-item" data-value="${escapeHtml(tz.value)}" data-index="${index}" role="option">
                             <div class="autocomplete-timezone">${escapeHtml(tz.label)}</div>
-                            <div class="autocomplete-region">${escapeHtml(tz.region)} <span class="autocomplete-offset">${tz.offset}</span></div>
+                            <div class="autocomplete-region">${escapeHtml(tz.region)} <span class="autocomplete-offset">${escapeHtml(tz.offset)}</span></div>
                         </div>
                     `).join('');
                     dropdown.classList.add('show');
+                    input.setAttribute('aria-expanded', 'true');
                     activeIndex = -1;
                 } else {
                     dropdown.innerHTML = '<div class="autocomplete-item" style="cursor: default;"><div class="autocomplete-region">No matching timezones found</div></div>';
@@ -940,6 +952,7 @@
                     }
                 } else if (e.key === 'Escape') {
                     dropdown.classList.remove('show');
+                    input.setAttribute('aria-expanded', 'false');
                     activeIndex = -1;
                 }
             });
@@ -956,6 +969,7 @@
             document.addEventListener('click', function(e) {
                 if (!input.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.classList.remove('show');
+                    input.setAttribute('aria-expanded', 'false');
                     activeIndex = -1;
                 }
             });
@@ -973,9 +987,11 @@
             items.forEach((item, idx) => {
                 if (idx === activeIndex) {
                     item.classList.add('active');
+                    item.setAttribute('aria-selected', 'true');
                     item.scrollIntoView({ block: 'nearest' });
                 } else {
                     item.classList.remove('active');
+                    item.setAttribute('aria-selected', 'false');
                 }
             });
         }
@@ -988,6 +1004,7 @@
             input.value = `${label} - ${region}`;
             input.setAttribute('data-timezone-value', value);
             dropdown.classList.remove('show');
+            input.setAttribute('aria-expanded', 'false');
             
             if (onSelect) {
                 onSelect(value);
