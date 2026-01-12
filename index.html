@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Time Zone Coordinator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .timezone-row {
+            transition: all 0.3s ease;
+        }
+        .time-slot {
+            transition: all 0.2s ease;
+        }
+        .time-slot:hover {
+            transform: scale(1.05);
+        }
+        .best-window {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">🌍 Meeting Time Zone Coordinator</h1>
+            <p class="text-gray-600">Find the perfect meeting time across multiple time zones</p>
+        </div>
+
+        <!-- Attendee Input Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add Attendees</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input 
+                    type="text" 
+                    id="attendeeName" 
+                    placeholder="Attendee Name"
+                    class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                <select 
+                    id="attendeeTimezone" 
+                    class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                    <option value="">Select Time Zone</option>
+                </select>
+                <button 
+                    onclick="addAttendee()" 
+                    class="bg-indigo-600 text-white rounded-lg px-6 py-2 hover:bg-indigo-700 transition font-semibold"
+                >
+                    + Add Attendee
+                </button>
+            </div>
+
+            <!-- Attendees List -->
+            <div id="attendeesList" class="space-y-2"></div>
+        </div>
+
+        <!-- Date Selector -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Select Meeting Date</h2>
+            <input 
+                type="date" 
+                id="meetingDate" 
+                class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+            <button 
+                onclick="generateTimeline()" 
+                class="ml-4 bg-green-600 text-white rounded-lg px-6 py-2 hover:bg-green-700 transition font-semibold"
+            >
+                Generate Timeline
+            </button>
+        </div>
+
+        <!-- Timeline Visualization -->
+        <div id="timelineSection" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Meeting Time Visualization</h2>
+            
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-4 mb-6 text-sm">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-400 rounded mr-2"></div>
+                    <span>Working Hours</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-yellow-300 rounded mr-2"></div>
+                    <span>Early/Late Hours</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-red-300 rounded mr-2"></div>
+                    <span>Night Hours</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-300 rounded mr-2"></div>
+                    <span>Lunch Time</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-purple-500 rounded mr-2"></div>
+                    <span>Best Meeting Window</span>
+                </div>
+            </div>
+
+            <div id="timelineGrid" class="overflow-x-auto"></div>
+        </div>
+
+        <!-- Best Meeting Times -->
+        <div id="bestTimesSection" class="bg-white rounded-lg shadow-lg p-6 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">🎯 Recommended Meeting Times</h2>
+            <div id="bestTimesList" class="space-y-3"></div>
+        </div>
+
+        <!-- Calendar Integration -->
+        <div id="calendarSection" class="bg-white rounded-lg shadow-lg p-6 mt-6 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">📅 Schedule Meeting</h2>
+            <div class="space-y-4">
+                <input 
+                    type="text" 
+                    id="meetingTitle" 
+                    placeholder="Meeting Title"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                >
+                <textarea 
+                    id="meetingDescription" 
+                    placeholder="Meeting Description (optional)"
+                    rows="3"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                ></textarea>
+                <select 
+                    id="selectedTime" 
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                >
+                    <option value="">Select a recommended time</option>
+                </select>
+                <div class="flex gap-4">
+                    <button 
+                        onclick="createGoogleCalendarEvent()" 
+                        class="flex-1 bg-blue-600 text-white rounded-lg px-6 py-3 hover:bg-blue-700 transition font-semibold"
+                    >
+                        📅 Add to Google Calendar
+                    </button>
+                    <button 
+                        onclick="downloadICS()" 
+                        class="flex-1 bg-indigo-600 text-white rounded-lg px-6 py-3 hover:bg-indigo-700 transition font-semibold"
+                    >
+                        📥 Download .ics File
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let attendees = [];
+        let bestMeetingWindows = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTimezones();
+            setDefaultDate();
+        });
+
+        // Populate timezone dropdown
+        function populateTimezones() {
+            const timezones = [
+                'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+                'America/Toronto', 'America/Vancouver', 'America/Mexico_City', 'America/Sao_Paulo',
+                'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Rome', 'Europe/Madrid',
+                'Europe/Amsterdam', 'Europe/Stockholm', 'Europe/Moscow',
+                'Asia/Dubai', 'Asia/Kolkata', 'Asia/Bangkok', 'Asia/Singapore', 
+                'Asia/Hong_Kong', 'Asia/Shanghai', 'Asia/Tokyo', 'Asia/Seoul',
+                'Australia/Sydney', 'Australia/Melbourne', 'Pacific/Auckland',
+                'Africa/Cairo', 'Africa/Johannesburg', 'Africa/Lagos'
+            ];
+
+            const select = document.getElementById('attendeeTimezone');
+            timezones.forEach(tz => {
+                const option = document.createElement('option');
+                option.value = tz;
+                option.textContent = tz.replace(/_/g, ' ');
+                select.appendChild(option);
+            });
+        }
+
+        // Set default date to today
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('meetingDate').value = today;
+        }
+
+        // Add attendee
+        function addAttendee() {
+            const name = document.getElementById('attendeeName').value.trim();
+            const timezone = document.getElementById('attendeeTimezone').value;
+
+            if (!name || !timezone) {
+                alert('Please enter both name and timezone');
+                return;
+            }
+
+            attendees.push({ id: Date.now(), name, timezone });
+            updateAttendeesList();
+            
+            // Clear inputs
+            document.getElementById('attendeeName').value = '';
+            document.getElementById('attendeeTimezone').value = '';
+        }
+
+        // Update attendees list display
+        function updateAttendeesList() {
+            const list = document.getElementById('attendeesList');
+            if (attendees.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4">No attendees added yet</p>';
+                return;
+            }
+
+            list.innerHTML = attendees.map(att => `
+                <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3 timezone-row">
+                    <div>
+                        <span class="font-semibold text-gray-800">${att.name}</span>
+                        <span class="text-gray-600 ml-2">(${att.timezone.replace(/_/g, ' ')})</span>
+                    </div>
+                    <button 
+                        onclick="removeAttendee(${att.id})" 
+                        class="text-red-600 hover:text-red-800 font-semibold"
+                    >
+                        Remove
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Remove attendee
+        function removeAttendee(id) {
+            attendees = attendees.filter(att => att.id !== id);
+            updateAttendeesList();
+        }
+
+        // Generate timeline
+        function generateTimeline() {
+            if (attendees.length === 0) {
+                alert('Please add at least one attendee');
+                return;
+            }
+
+            const dateStr = document.getElementById('meetingDate').value;
+            if (!dateStr) {
+                alert('Please select a meeting date');
+                return;
+            }
+
+            const selectedDate = new Date(dateStr + 'T00:00:00');
+            const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
+
+            // Generate 24-hour timeline
+            const hours = Array.from({ length: 24 }, (_, i) => i);
+            
+            let gridHTML = '<div class="overflow-x-auto"><table class="w-full border-collapse text-sm">';
+            
+            // Header row with hours
+            gridHTML += '<thead><tr><th class="border p-2 bg-gray-100 sticky left-0 z-10">Attendee</th>';
+            hours.forEach(hour => {
+                gridHTML += `<th class="border p-2 bg-gray-100 min-w-[60px]">${hour.toString().padStart(2, '0')}:00</th>`;
+            });
+            gridHTML += '</tr></thead><tbody>';
+
+            // Calculate times for each attendee
+            const attendeeHours = [];
+            
+            attendees.forEach(att => {
+                gridHTML += `<tr><td class="border p-2 font-semibold bg-gray-50 sticky left-0 z-10">${att.name}</td>`;
+                const hourColors = [];
+                
+                hours.forEach(hour => {
+                    const dateTime = new Date(dateStr + `T${hour.toString().padStart(2, '0')}:00:00`);
+                    const localTime = new Date(dateTime.toLocaleString('en-US', { timeZone: att.timezone }));
+                    const localHour = localTime.getHours();
+                    const localDay = localTime.getDay();
+                    
+                    let color = getHourColor(localHour, localDay === 0 || localDay === 6);
+                    hourColors.push({ hour, color, localHour });
+                    
+                    gridHTML += `<td class="border p-1 time-slot ${color}" title="${att.name}: ${localHour}:00">
+                        <div class="text-xs text-center">${localHour.toString().padStart(2, '0')}:00</div>
+                    </td>`;
+                });
+                
+                attendeeHours.push(hourColors);
+                gridHTML += '</tr>';
+            });
+
+            gridHTML += '</tbody></table></div>';
+            
+            document.getElementById('timelineGrid').innerHTML = gridHTML;
+            document.getElementById('timelineSection').classList.remove('hidden');
+
+            // Find best meeting windows
+            findBestMeetingWindows(attendeeHours, dateStr, isWeekend);
+        }
+
+        // Get color for hour based on local time
+        function getHourColor(hour, isWeekend) {
+            if (isWeekend) return 'bg-gray-200';
+            if (hour >= 9 && hour < 12) return 'bg-green-400'; // Morning working hours
+            if (hour === 12 || hour === 13) return 'bg-blue-300'; // Lunch time
+            if (hour >= 14 && hour < 17) return 'bg-green-400'; // Afternoon working hours
+            if ((hour >= 8 && hour < 9) || (hour >= 17 && hour < 19)) return 'bg-yellow-300'; // Early/late
+            return 'bg-red-300'; // Night hours
+        }
+
+        // Find best meeting windows
+        function findBestMeetingWindows(attendeeHours, dateStr, isWeekend) {
+            const hours = Array.from({ length: 24 }, (_, i) => i);
+            const windowScores = [];
+
+            hours.forEach(hour => {
+                let score = 0;
+                let details = [];
+
+                attendees.forEach((att, idx) => {
+                    const hourData = attendeeHours[idx].find(h => h.hour === hour);
+                    const localHour = hourData.localHour;
+                    
+                    // Scoring system
+                    if (isWeekend) {
+                        score -= 50; // Penalize weekend meetings
+                    } else if (localHour >= 9 && localHour < 12) {
+                        score += 10; // Morning working hours
+                    } else if (localHour >= 14 && localHour < 17) {
+                        score += 10; // Afternoon working hours
+                    } else if (localHour === 12 || localHour === 13) {
+                        score += 3; // Lunch time (acceptable)
+                    } else if ((localHour >= 8 && localHour < 9) || (localHour >= 17 && localHour < 19)) {
+                        score += 1; // Early/late (less ideal)
+                    } else {
+                        score -= 20; // Night hours (bad)
+                    }
+
+                    details.push({
+                        name: att.name,
+                        localHour: localHour,
+                        timezone: att.timezone
+                    });
+                });
+
+                windowScores.push({ hour, score, details });
+            });
+
+            // Sort by score and get top 5
+            windowScores.sort((a, b) => b.score - a.score);
+            bestMeetingWindows = windowScores.slice(0, 5);
+
+            displayBestMeetingWindows(dateStr);
+        }
+
+        // Display best meeting windows
+        function displayBestMeetingWindows(dateStr) {
+            const section = document.getElementById('bestTimesSection');
+            const list = document.getElementById('bestTimesList');
+            const selectDropdown = document.getElementById('selectedTime');
+
+            selectDropdown.innerHTML = '<option value="">Select a recommended time</option>';
+
+            if (bestMeetingWindows.length === 0) {
+                list.innerHTML = '<p class="text-gray-500">No suitable meeting times found</p>';
+                section.classList.remove('hidden');
+                return;
+            }
+
+            list.innerHTML = bestMeetingWindows.map((window, idx) => {
+                const timeStr = `${dateStr}T${window.hour.toString().padStart(2, '0')}:00:00`;
+                const badge = idx === 0 ? '<span class="bg-purple-500 text-white px-2 py-1 rounded text-xs ml-2">BEST</span>' : '';
+                
+                // Add to dropdown
+                selectDropdown.innerHTML += `<option value="${timeStr}">Option ${idx + 1}: UTC ${window.hour.toString().padStart(2, '0')}:00 (Score: ${window.score})</option>`;
+
+                return `
+                    <div class="border ${idx === 0 ? 'border-purple-500 best-window' : 'border-gray-300'} rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-lg">Option ${idx + 1}${badge}</h3>
+                            <span class="text-sm text-gray-600">Score: ${window.score}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            ${window.details.map(d => `
+                                <div class="text-sm">
+                                    <span class="font-semibold">${d.name}:</span> 
+                                    ${d.localHour.toString().padStart(2, '0')}:00 
+                                    <span class="text-gray-600">(${d.timezone.split('/')[1]})</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            section.classList.remove('hidden');
+            document.getElementById('calendarSection').classList.remove('hidden');
+        }
+
+        // Create Google Calendar event
+        function createGoogleCalendarEvent() {
+            const title = document.getElementById('meetingTitle').value.trim();
+            const description = document.getElementById('meetingDescription').value.trim();
+            const selectedTime = document.getElementById('selectedTime').value;
+
+            if (!title || !selectedTime) {
+                alert('Please enter a meeting title and select a time');
+                return;
+            }
+
+            const startDate = new Date(selectedTime);
+            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour meeting
+
+            const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
+            googleCalendarUrl.searchParams.append('action', 'TEMPLATE');
+            googleCalendarUrl.searchParams.append('text', title);
+            googleCalendarUrl.searchParams.append('details', description);
+            googleCalendarUrl.searchParams.append('dates', 
+                `${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}`);
+
+            // Add attendees as text
+            const attendeeList = attendees.map(a => `${a.name} (${a.timezone})`).join(', ');
+            googleCalendarUrl.searchParams.append('details', 
+                `${description}\n\nAttendees: ${attendeeList}`);
+
+            window.open(googleCalendarUrl.toString(), '_blank');
+        }
+
+        // Format date for Google Calendar
+        function formatGoogleDate(date) {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+
+        // Download ICS file
+        function downloadICS() {
+            const title = document.getElementById('meetingTitle').value.trim();
+            const description = document.getElementById('meetingDescription').value.trim();
+            const selectedTime = document.getElementById('selectedTime').value;
+
+            if (!title || !selectedTime) {
+                alert('Please enter a meeting title and select a time');
+                return;
+            }
+
+            const startDate = new Date(selectedTime);
+            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+
+            const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Meeting Time Zone Coordinator//EN
+BEGIN:VEVENT
+UID:${Date.now()}@meetingcoordinator
+DTSTAMP:${formatICSDate(new Date())}
+DTSTART:${formatICSDate(startDate)}
+DTEND:${formatICSDate(endDate)}
+SUMMARY:${title}
+DESCRIPTION:${description}\\n\\nAttendees: ${attendees.map(a => `${a.name} (${a.timezone})`).join(', ')}
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.replace(/\s+/g, '_')}.ics`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Format date for ICS
+        function formatICSDate(date) {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+    </script>
+</body>
+</html>
