@@ -1,4 +1,6 @@
-# 🌍 Meeting Time Zone Coordinator
+# 🌍 MeetAcross
+
+**Connect Teams Across Time Zones**
 
 A powerful, intuitive web application that helps you find the perfect meeting time across multiple time zones. No more mental math or timezone confusion!
 
@@ -23,7 +25,7 @@ A powerful, intuitive web application that helps you find the perfect meeting ti
 ## ✨ Features
 
 ### Core Features
-- **Multi-timezone Support**: Add unlimited attendees from 30+ major time zones worldwide
+- **Multi-timezone Support**: Add unlimited attendees from 418+ time zones worldwide covering all countries and cities
 - **Visual Timeline**: Color-coded 24-hour timeline showing working hours for each attendee
 - **Smart Recommendations**: Algorithm finds the best meeting windows based on:
   - Working hours (9 AM - 5 PM local time)
@@ -48,7 +50,7 @@ A powerful, intuitive web application that helps you find the perfect meeting ti
 
 ### Option 1: Direct Browser Open (Simplest)
 
-1. Download the `meeting-timezone-coordinator.html` file
+1. Download the `index.html` file
 2. Double-click the file to open it in your default browser
 3. Start adding attendees!
 
@@ -68,7 +70,7 @@ npx http-server
 php -S localhost:8000
 ```
 
-Then open `http://localhost:8000/meeting-timezone-coordinator.html` in your browser.
+Then open `http://localhost:8000/index.html` in your browser.
 
 ### Option 3: Deploy to Web Server
 
@@ -97,8 +99,8 @@ Upload the single HTML file to any web hosting service:
 
 ```bash
 # Clone from repository
-git clone https://github.com/yourusername/meeting-timezone-coordinator.git
-cd meeting-timezone-coordinator
+git clone https://github.com/MeetAcross/MeetAcross.github.io.git
+cd MeetAcross.github.io
 
 # Or simply download the HTML file directly
 ```
@@ -108,13 +110,13 @@ cd meeting-timezone-coordinator
 **Method A: Direct Open**
 ```bash
 # On macOS
-open meeting-timezone-coordinator.html
+open index.html
 
 # On Linux
-xdg-open meeting-timezone-coordinator.html
+xdg-open index.html
 
 # On Windows
-start meeting-timezone-coordinator.html
+start index.html
 ```
 
 **Method B: Using a Local Server**
@@ -122,14 +124,15 @@ start meeting-timezone-coordinator.html
 # Python 3
 python3 -m http.server 8000
 
-# Then visit: http://localhost:8000/meeting-timezone-coordinator.html
+# Then visit: http://localhost:8000/index.html
 ```
 
 #### 3. Verify It's Working
 
 You should see:
 - A gradient blue background
-- "Meeting Time Zone Coordinator" header
+- MeetAcross logo and header
+- "Connect Teams Across Time Zones" tagline
 - Input fields for adding attendees
 - Date selector
 
@@ -140,9 +143,9 @@ If you see these elements, you're all set! 🎉
 ### Architecture
 
 ```
-meeting-timezone-coordinator.html
+index.html
 ├── HTML Structure
-│   ├── Header Section
+│   ├── Header Section (with MeetAcross logo)
 │   ├── Attendee Input Form
 │   ├── Date Selector
 │   ├── Timeline Visualization
@@ -349,47 +352,22 @@ async function createOutlookEvent(eventDetails) {
 
 ### Supported Timezones
 
-The application includes 30 major timezones:
+The application includes **418 comprehensive timezones** covering all countries and cities worldwide:
 
-**Americas:**
-- America/New_York (EST/EDT)
-- America/Chicago (CST/CDT)
-- America/Denver (MST/MDT)
-- America/Los_Angeles (PST/PDT)
-- America/Toronto
-- America/Vancouver
-- America/Mexico_City
-- America/Sao_Paulo
+**Complete Global Coverage:**
+- **Africa**: 52 timezones including Cairo, Johannesburg, Lagos, Nairobi, and more
+- **Americas**: 147 timezones covering North, Central, and South America
+- **Antarctica**: 11 research station timezones
+- **Arctic**: Longyearbyen
+- **Asia**: 84 timezones including Dubai, Tokyo, Singapore, Hong Kong, and more
+- **Atlantic**: 10 island and coastal timezones
+- **Australia**: 11 timezones covering all territories
+- **Europe**: 62 timezones covering all European countries
+- **Indian Ocean**: 11 island timezones
+- **Pacific**: 30 timezones covering Pacific islands and territories
 
-**Europe:**
-- Europe/London (GMT/BST)
-- Europe/Paris (CET/CEST)
-- Europe/Berlin
-- Europe/Rome
-- Europe/Madrid
-- Europe/Amsterdam
-- Europe/Stockholm
-- Europe/Moscow
-
-**Asia:**
-- Asia/Dubai
-- Asia/Kolkata (IST)
-- Asia/Bangkok
-- Asia/Singapore
-- Asia/Hong_Kong
-- Asia/Shanghai
-- Asia/Tokyo
-- Asia/Seoul
-
-**Oceania:**
-- Australia/Sydney
-- Australia/Melbourne
-- Pacific/Auckland
-
-**Africa:**
-- Africa/Cairo
-- Africa/Johannesburg
-- Africa/Lagos
+**Major Cities and Countries Include:**
+All capital cities, major metropolitan areas, and countries worldwide are represented.
 
 ### Adding More Timezones
 
@@ -467,12 +445,11 @@ if (localHour >= 9 && localHour < 12) {
 
 ### Adding Your Logo
 
+The application now uses the MeetAcross logo from Cloudinary. To customize:
+
 ```html
-<!-- Replace the emoji in the header -->
-<h1 class="text-4xl font-bold text-indigo-700 mb-2">
-    <img src="your-logo.png" alt="Logo" class="inline-block h-10 w-10 mr-2">
-    Meeting Time Zone Coordinator
-</h1>
+<!-- Update the logo source in the header -->
+<img src="your-logo-url.png" alt="Your Logo" class="h-16 w-16 md:h-20 md:w-20 object-contain">
 ```
 
 ## 🌐 Browser Support
@@ -588,15 +565,15 @@ If you encounter issues:
 ```bash
 # Create repository
 git init
-git add meeting-timezone-coordinator.html
+git add index.html
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/username/meeting-coordinator.git
+git remote add origin https://github.com/MeetAcross/MeetAcross.github.io.git
 git push -u origin main
 
 # Enable GitHub Pages
 # Go to Settings → Pages → Source: main branch → Save
-# Access at: https://username.github.io/meeting-coordinator/meeting-timezone-coordinator.html
+# Access at: https://meetacross.github.io/
 ```
 
 ### 2. Netlify (Free)
@@ -621,13 +598,13 @@ vercel
 
 ```bash
 # Create S3 bucket
-aws s3 mb s3://meeting-coordinator
+aws s3 mb s3://meetacross
 
 # Enable static website hosting
-aws s3 website s3://meeting-coordinator --index-document meeting-timezone-coordinator.html
+aws s3 website s3://meetacross --index-document index.html
 
 # Upload file
-aws s3 cp meeting-timezone-coordinator.html s3://meeting-coordinator/ --acl public-read
+aws s3 cp index.html s3://meetacross/ --acl public-read
 
 # Optional: Set up CloudFront for CDN
 ```
@@ -645,7 +622,7 @@ Simply upload via FTP/SFTP to any web host:
 
 ### Current Performance
 - **Load Time**: < 1 second
-- **File Size**: ~18 KB (single HTML file)
+- **File Size**: ~30 KB (single HTML file with comprehensive timezone support)
 - **Dependencies**: Tailwind CSS CDN (~50 KB gzipped)
 
 ### Optimization Tips
@@ -662,7 +639,7 @@ Simply upload via FTP/SFTP to any web host:
 ```bash
 # Use HTML minifier
 npm install -g html-minifier
-html-minifier --collapse-whitespace --remove-comments meeting-timezone-coordinator.html -o meeting-coordinator.min.html
+html-minifier --collapse-whitespace --remove-comments index.html -o index.min.html
 ```
 
 #### 3. Enable Compression
@@ -763,25 +740,27 @@ SOFTWARE.
 
 - **Tailwind CSS**: For the amazing utility-first CSS framework
 - **Google Calendar API**: For calendar integration capabilities
-- **IANA Time Zone Database**: For accurate timezone information
+- **IANA Time Zone Database**: For accurate timezone information (418 timezones supported)
 - **MDN Web Docs**: For excellent JavaScript documentation
+- **Cloudinary**: For reliable image hosting
 
 ## 📞 Support
 
-- **Documentation**: This README
-- **Issues**: [GitHub Issues](https://github.com/username/meeting-coordinator/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/username/meeting-coordinator/discussions)
+- **Documentation**: [GitHub Issues](https://github.com/MeetAcross/MeetAcross.github.io/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/MeetAcross/MeetAcross.github.io/discussions)
 
 ## 🗺️ Roadmap
 
-### Version 1.1 (Planned)
+### Version 1.1 (Completed)
+- [x] 418 comprehensive global timezones
+- [x] MeetAcross branding and logo
+- [x] Team templates (save common groups)
+- [x] Export to CSV
+- [x] Dark mode
+
+### Version 1.2 (Planned)
 - [ ] Recurring meeting support
 - [ ] More calendar integrations (Outlook, Apple)
-- [ ] Team templates (save common groups)
-- [ ] Export to CSV
-
-### Version 1.2 (Future)
-- [ ] Dark mode
 - [ ] Multiple language support
 - [ ] Mobile app (PWA)
 - [ ] Meeting preferences per attendee
@@ -793,6 +772,12 @@ SOFTWARE.
 - [ ] Advanced analytics
 
 ## 📈 Changelog
+
+### Version 1.1.0 (2026-01-12)
+- Added comprehensive global timezone support (418 timezones)
+- Updated branding to "MeetAcross - Connect Teams Across Time Zones"
+- Added MeetAcross logo and favicon
+- Enhanced timezone coverage for all countries and cities worldwide
 
 ### Version 1.0.0 (2025-01-12)
 - Initial release
