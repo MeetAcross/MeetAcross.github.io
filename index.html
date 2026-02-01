@@ -897,24 +897,24 @@
                     
                     <div>
                         <h4 class="text-lg font-semibold text-gray-800 mb-2">🎨 Color Guide</h4>
-                        <div class="space-y-2">
+                        <div class="space-y-2" aria-live="polite" id="colorLegendContainer">
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-green-400 rounded"></div>
                                 <span class="text-gray-700" id="legendGreenText"><strong>Green:</strong> Optimal hours</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" id="legendBlueRow">
                                 <div class="w-6 h-6 bg-blue-300 rounded"></div>
                                 <span class="text-gray-700" id="legendBlueText"><strong>Blue:</strong> Lunch time (12 PM - 2 PM)</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-yellow-300 rounded"></div>
-                                <span class="text-gray-700" id="legendYellowText"><strong>Yellow:</strong> Acceptable hours <span id="legendFlexHours"></span></span>
+                                <span class="text-gray-700" id="legendYellowText"><strong>Yellow:</strong> Acceptable hours</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-red-300 rounded"></div>
-                                <span class="text-gray-700" id="legendRedText"><strong>Red:</strong> Avoid <span id="legendNightHours"></span></span>
+                                <span class="text-gray-700" id="legendRedText"><strong>Red:</strong> Avoid</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" id="legendGrayRow">
                                 <div class="w-6 h-6 bg-gray-200 rounded"></div>
                                 <span class="text-gray-700" id="legendGrayText"><strong>Gray:</strong> Weekend</span>
                             </div>
@@ -1207,11 +1207,11 @@
             // Update legend elements
             const legendGreenText = document.getElementById('legendGreenText');
             const legendBlueText = document.getElementById('legendBlueText');
+            const legendBlueRow = document.getElementById('legendBlueRow');
             const legendYellowText = document.getElementById('legendYellowText');
             const legendRedText = document.getElementById('legendRedText');
             const legendGrayText = document.getElementById('legendGrayText');
-            const legendFlexHours = document.getElementById('legendFlexHours');
-            const legendNightHours = document.getElementById('legendNightHours');
+            const legendGrayRow = document.getElementById('legendGrayRow');
             const purposeBadge = document.getElementById('purposeBadge');
             
             if (officialRadio.checked) {
@@ -1222,12 +1222,14 @@
                 personalLabel.classList.add('border-gray-200');
                 descriptionText.innerHTML = '<span class="text-indigo-600 font-semibold">Official meetings</span> prioritize strict business hours (9 AM - 5 PM) with lunch break consideration (12-2 PM). Weekends are avoided. Focus on professional scheduling.';
                 
-                // Update legend for official meetings
+                // Update legend for official meetings - update text content only
                 if (legendGreenText) legendGreenText.innerHTML = '<strong>Green:</strong> Core business hours (9 AM-12 PM, 2-5 PM)';
                 if (legendBlueText) legendBlueText.innerHTML = '<strong>Blue:</strong> Lunch time (12-2 PM) - acceptable';
-                if (legendYellowText) legendYellowText.innerHTML = '<strong>Yellow:</strong> Edge hours <span id="legendFlexHours">(7-8 AM, 6-7 PM)</span>';
-                if (legendRedText) legendRedText.innerHTML = '<strong>Red:</strong> Non-business hours <span id="legendNightHours">(before 7 AM, after 7 PM)</span>';
+                if (legendBlueRow) legendBlueRow.style.display = 'flex'; // Show blue row for official
+                if (legendYellowText) legendYellowText.innerHTML = '<strong>Yellow:</strong> Edge hours (7-8 AM, 6-7 PM)';
+                if (legendRedText) legendRedText.innerHTML = '<strong>Red:</strong> Non-business hours (before 7 AM, after 7 PM)';
                 if (legendGrayText) legendGrayText.innerHTML = '<strong>Gray:</strong> Weekend (avoid for office)';
+                if (legendGrayRow) legendGrayRow.style.display = 'flex'; // Show gray row for official
                 
                 if (purposeBadge) purposeBadge.innerHTML = '<span class="text-indigo-700 font-medium text-xs">💼 Official Mode</span>';
                 if (purposeBadge) purposeBadge.className = 'flex items-center ml-auto bg-indigo-100 px-3 py-1 rounded-full';
@@ -1241,12 +1243,14 @@
                 officialLabel.classList.add('border-gray-200');
                 descriptionText.innerHTML = '<span class="text-purple-600 font-semibold">Personal meetings</span> focus on avoiding sleeping hours (11 PM - 7 AM). Flexible scheduling throughout the day and evening. Weekends are great for personal catch-ups!';
                 
-                // Update legend for personal meetings
+                // Update legend for personal meetings - update text content only
                 if (legendGreenText) legendGreenText.innerHTML = '<strong>Green:</strong> Daytime hours (7 AM-11 PM) + Weekend days';
-                if (legendBlueText) legendBlueText.innerHTML = '<strong>Blue:</strong> N/A for personal meetings';
-                if (legendYellowText) legendYellowText.innerHTML = '<strong>Yellow:</strong> Evening hours <span id="legendFlexHours">(6-11 PM on weekdays)</span>';
-                if (legendRedText) legendRedText.innerHTML = '<strong>Red:</strong> Sleeping hours <span id="legendNightHours">(11 PM - 7 AM)</span>';
-                if (legendGrayText) legendGrayText.innerHTML = '<strong>Gray:</strong> N/A (weekends are available)';
+                if (legendBlueText) legendBlueText.innerHTML = '<strong>Blue:</strong> Not used for personal meetings';
+                if (legendBlueRow) legendBlueRow.style.display = 'none'; // Hide blue row for personal
+                if (legendYellowText) legendYellowText.innerHTML = '<strong>Yellow:</strong> Evening hours (6-11 PM on weekdays)';
+                if (legendRedText) legendRedText.innerHTML = '<strong>Red:</strong> Sleeping hours (11 PM - 7 AM)';
+                if (legendGrayText) legendGrayText.innerHTML = '<strong>Gray:</strong> Not used (weekends shown in green)';
+                if (legendGrayRow) legendGrayRow.style.display = 'none'; // Hide gray row for personal
                 
                 if (purposeBadge) purposeBadge.innerHTML = '<span class="text-purple-700 font-medium text-xs">🌙 Personal Mode</span>';
                 if (purposeBadge) purposeBadge.className = 'flex items-center ml-auto bg-purple-100 px-3 py-1 rounded-full';
