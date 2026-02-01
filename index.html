@@ -1041,7 +1041,6 @@
 
         // Global city data loaded from cities.json
         let citiesData = [];
-        let citiesLoaded = false;
 
         // Load cities from JSON file
         async function loadCitiesData() {
@@ -1051,21 +1050,14 @@
                     throw new Error('Failed to load cities.json');
                 }
                 citiesData = await response.json();
-                citiesLoaded = true;
                 console.log(`Loaded ${citiesData.length} cities from cities.json`);
                 return citiesData;
             } catch (error) {
                 console.error('Error loading cities data:', error);
                 // Fallback: return empty array if file cannot be loaded
                 citiesData = [];
-                citiesLoaded = true;
                 return citiesData;
             }
-        }
-
-        // Get city list (returns array of city objects with city, country, timezone)
-        function getCityList() {
-            return citiesData;
         }
 
         // Get timezone list (returns array of timezone strings for backward compatibility)
@@ -1576,7 +1568,6 @@
             const cityInfo = citiesData.find(c => c.timezone === timezone);
             if (cityInfo) {
                 return { 
-                    region: cityInfo.country, 
                     city: cityInfo.city, 
                     country: cityInfo.country,
                     full: `${cityInfo.city}, ${cityInfo.country}` 
@@ -1587,14 +1578,9 @@
             if (parts.length > 1) {
                 const region = parts[0];
                 const city = parts[parts.length - 1].replace(/_/g, ' ');
-                return { region, city, country: region, full: `${city}, ${region}` };
+                return { city, country: region, full: `${city}, ${region}` };
             }
-            return { region: '', city: timezone.replace(/_/g, ' '), country: '', full: timezone.replace(/_/g, ' ') };
-        }
-        
-        // Get city info by timezone
-        function getCityInfoByTimezone(timezone) {
-            return citiesData.find(c => c.timezone === timezone) || null;
+            return { city: timezone.replace(/_/g, ' '), country: '', full: timezone.replace(/_/g, ' ') };
         }
         
         // Timezone autocomplete state
