@@ -897,26 +897,26 @@
                     
                     <div>
                         <h4 class="text-lg font-semibold text-gray-800 mb-2">🎨 Color Guide</h4>
-                        <div class="space-y-2">
+                        <div class="space-y-2" aria-live="polite" id="colorLegendContainer">
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-green-400 rounded"></div>
-                                <span class="text-gray-700"><strong>Green:</strong> Optimal working hours (9 AM - 5 PM)</span>
+                                <span class="text-gray-700" id="legendGreenText"><strong>Green:</strong> Optimal hours</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" id="legendBlueRow">
                                 <div class="w-6 h-6 bg-blue-300 rounded"></div>
-                                <span class="text-gray-700"><strong>Blue:</strong> Lunch time (12 PM - 1 PM)</span>
+                                <span class="text-gray-700" id="legendBlueText"><strong>Blue:</strong> Lunch time (12 PM - 2 PM)</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-yellow-300 rounded"></div>
-                                <span class="text-gray-700"><strong>Yellow:</strong> Early/Late hours (8-9 AM, 5-7 PM)</span>
+                                <span class="text-gray-700" id="legendYellowText"><strong>Yellow:</strong> Acceptable hours</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-red-300 rounded"></div>
-                                <span class="text-gray-700"><strong>Red:</strong> Night hours (avoid)</span>
+                                <span class="text-gray-700" id="legendRedText"><strong>Red:</strong> Avoid</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" id="legendGrayRow">
                                 <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                <span class="text-gray-700"><strong>Gray:</strong> Weekend</span>
+                                <span class="text-gray-700" id="legendGrayText"><strong>Gray:</strong> Weekend</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-purple-500 rounded"></div>
@@ -1205,8 +1205,13 @@
             const descriptionText = document.getElementById('purposeDescriptionText');
             
             // Update legend elements
-            const legendFlexHours = document.getElementById('legendFlexHours');
-            const legendNightHours = document.getElementById('legendNightHours');
+            const legendGreenText = document.getElementById('legendGreenText');
+            const legendBlueText = document.getElementById('legendBlueText');
+            const legendBlueRow = document.getElementById('legendBlueRow');
+            const legendYellowText = document.getElementById('legendYellowText');
+            const legendRedText = document.getElementById('legendRedText');
+            const legendGrayText = document.getElementById('legendGrayText');
+            const legendGrayRow = document.getElementById('legendGrayRow');
             const purposeBadge = document.getElementById('purposeBadge');
             
             if (officialRadio.checked) {
@@ -1215,30 +1220,42 @@
                 officialLabel.classList.remove('border-gray-200');
                 personalLabel.classList.remove('border-purple-500', 'bg-purple-50');
                 personalLabel.classList.add('border-gray-200');
-                descriptionText.innerHTML = '<span class="text-indigo-600 font-semibold">Official meetings</span> prioritize standard business hours (9 AM - 6 PM) and avoid early mornings or late evenings. Night hours are strongly penalized.';
+                descriptionText.innerHTML = '<span class="text-indigo-600 font-semibold">Official meetings</span> prioritize strict business hours (9 AM - 5 PM) with lunch break consideration (12-2 PM). Weekends are avoided. Focus on professional scheduling.';
                 
-                // Update legend
-                if (legendFlexHours) legendFlexHours.textContent = '(8-9 AM, 5-7 PM)';
-                if (legendNightHours) legendNightHours.textContent = '(avoid)';
+                // Update legend for official meetings - update text content only
+                if (legendGreenText) legendGreenText.innerHTML = '<strong>Green:</strong> Core business hours (9 AM-12 PM, 2-5 PM)';
+                if (legendBlueText) legendBlueText.innerHTML = '<strong>Blue:</strong> Lunch time (12-2 PM) - acceptable';
+                if (legendBlueRow) legendBlueRow.style.display = 'flex'; // Show blue row for official
+                if (legendYellowText) legendYellowText.innerHTML = '<strong>Yellow:</strong> Edge hours (7-8 AM, 6-7 PM)';
+                if (legendRedText) legendRedText.innerHTML = '<strong>Red:</strong> Non-business hours (before 7 AM, after 7 PM)';
+                if (legendGrayText) legendGrayText.innerHTML = '<strong>Gray:</strong> Weekend (avoid for office)';
+                if (legendGrayRow) legendGrayRow.style.display = 'flex'; // Show gray row for official
+                
                 if (purposeBadge) purposeBadge.innerHTML = '<span class="text-indigo-700 font-medium text-xs">💼 Official Mode</span>';
                 if (purposeBadge) purposeBadge.className = 'flex items-center ml-auto bg-indigo-100 px-3 py-1 rounded-full';
                 
-                showToast('Official meeting mode selected - Prioritizing business hours', 'info');
+                showToast('Official meeting mode - Strict business hours prioritized', 'info');
             } else {
                 meetingPurpose = 'personal';
                 personalLabel.classList.add('border-purple-500', 'bg-purple-50');
                 personalLabel.classList.remove('border-gray-200');
                 officialLabel.classList.remove('border-indigo-500', 'bg-indigo-50');
                 officialLabel.classList.add('border-gray-200');
-                descriptionText.innerHTML = '<span class="text-purple-600 font-semibold">Personal meetings</span> allow flexible hours including evenings (8 AM - 10 PM). Late evening slots are acceptable for catching up with friends and family across time zones.';
+                descriptionText.innerHTML = '<span class="text-purple-600 font-semibold">Personal meetings</span> focus on avoiding sleeping hours (11 PM - 7 AM). Flexible scheduling throughout the day and evening. Weekends are great for personal catch-ups!';
                 
-                // Update legend
-                if (legendFlexHours) legendFlexHours.textContent = '(8-9 AM, 5-10 PM)';
-                if (legendNightHours) legendNightHours.textContent = '(after 10 PM)';
+                // Update legend for personal meetings - update text content only
+                if (legendGreenText) legendGreenText.innerHTML = '<strong>Green:</strong> Daytime hours (7 AM-11 PM) + Weekend days';
+                if (legendBlueText) legendBlueText.innerHTML = '<strong>Blue:</strong> Not used for personal meetings';
+                if (legendBlueRow) legendBlueRow.style.display = 'none'; // Hide blue row for personal
+                if (legendYellowText) legendYellowText.innerHTML = '<strong>Yellow:</strong> Evening hours (6-11 PM on weekdays)';
+                if (legendRedText) legendRedText.innerHTML = '<strong>Red:</strong> Sleeping hours (11 PM - 7 AM)';
+                if (legendGrayText) legendGrayText.innerHTML = '<strong>Gray:</strong> Not used (weekends shown in green)';
+                if (legendGrayRow) legendGrayRow.style.display = 'none'; // Hide gray row for personal
+                
                 if (purposeBadge) purposeBadge.innerHTML = '<span class="text-purple-700 font-medium text-xs">🌙 Personal Mode</span>';
                 if (purposeBadge) purposeBadge.className = 'flex items-center ml-auto bg-purple-100 px-3 py-1 rounded-full';
                 
-                showToast('Personal meeting mode selected - Flexible evening hours enabled', 'info');
+                showToast('Personal meeting mode - Flexible hours, avoiding sleep time', 'info');
             }
             
             // If timeline is already generated, regenerate with new scoring
@@ -1249,10 +1266,8 @@
         
         // Initialize meeting purpose UI on page load
         function initMeetingPurposeUI() {
-            const officialLabel = document.getElementById('purposeOfficialLabel');
-            if (officialLabel) {
-                officialLabel.classList.add('border-indigo-500', 'bg-indigo-50');
-            }
+            // Call updateMeetingPurpose to initialize legend and UI properly
+            updateMeetingPurpose();
         }
         
         // Keyboard shortcuts
@@ -2126,28 +2141,55 @@
             }, 300);
         }
 
-        // Get color for hour based on local time
+        // Get color for hour based on local time - Optimized for better visual feedback
         function getHourColor(hour, isWeekend) {
-            if (isWeekend) return 'bg-gray-200';
+            const isPersonal = meetingPurpose === 'personal';
             
-            // For personal meetings, extended hours are more acceptable
-            if (meetingPurpose === 'personal') {
-                if (hour >= 9 && hour < 12) return 'bg-green-400'; // Morning working hours
-                if (hour === 12 || hour === 13) return 'bg-blue-300'; // Lunch time
-                if (hour >= 14 && hour < 17) return 'bg-green-400'; // Afternoon working hours
-                if ((hour >= 8 && hour < 9) || (hour >= 17 && hour < 22)) return 'bg-yellow-300'; // Early/late - extended for personal
-                return 'bg-red-300'; // Night hours (after 10 PM)
+            if (isPersonal) {
+                // PERSONAL MEETINGS: Focus on sleeping hours
+                
+                // Sleeping hours (11 PM - 7 AM) - Red
+                if (hour >= 23 || hour < 7) return 'bg-red-400';
+                
+                // Weekend coloring for personal
+                if (isWeekend) {
+                    // Weekend daytime (7 AM - 11 PM) - Green (great for personal meetings)
+                    return 'bg-green-300';
+                }
+                
+                // Weekday optimal hours (7 AM - 6 PM) - Green
+                if (hour >= 7 && hour < 18) return 'bg-green-400';
+                
+                // Weekday evening (6 PM - 11 PM) - Yellow (good but not optimal)
+                if (hour >= 18 && hour < 23) return 'bg-yellow-300';
+                
+                return 'bg-red-300';
+            } else {
+                // OFFICE MEETINGS: Strict business hours
+                
+                // Weekend - Gray (avoid for office)
+                if (isWeekend) return 'bg-gray-300';
+                
+                // Core business hours (9 AM - 12 PM, 2 PM - 5 PM) - Green
+                if ((hour >= 9 && hour < 12) || (hour >= 14 && hour < 17)) {
+                    return 'bg-green-400';
+                }
+                
+                // Lunch time (12 PM - 2 PM) - Blue
+                if (hour >= 12 && hour < 14) return 'bg-blue-300';
+                
+                // Early/late business hours (8 AM, 5 PM) - Light yellow
+                if (hour === 8 || hour === 17) return 'bg-yellow-200';
+                
+                // Extended hours (7 AM, 6 PM) - Yellow
+                if (hour === 7 || hour === 18) return 'bg-yellow-300';
+                
+                // Night/Early morning (before 7 AM, after 6 PM) - Red
+                return 'bg-red-300';
             }
-            
-            // Official meetings - standard hours
-            if (hour >= 9 && hour < 12) return 'bg-green-400'; // Morning working hours
-            if (hour === 12 || hour === 13) return 'bg-blue-300'; // Lunch time
-            if (hour >= 14 && hour < 17) return 'bg-green-400'; // Afternoon working hours
-            if ((hour >= 8 && hour < 9) || (hour >= 17 && hour < 19)) return 'bg-yellow-300'; // Early/late
-            return 'bg-red-300'; // Night hours
         }
 
-        // Find best meeting windows
+        // Find best meeting windows - Optimized algorithm
         function findBestMeetingWindows(attendeeHours, dateStr, isWeekend) {
             const hours = Array.from({ length: 24 }, (_, i) => i);
             const windowScores = [];
@@ -2161,27 +2203,67 @@
                     const hourData = attendeeHours[idx].find(h => h.hour === hour);
                     const localHour = hourData.localHour;
                     
-                    // Scoring system - adjusted based on meeting purpose
-                    if (isWeekend) {
-                        // Personal meetings on weekends are more acceptable
-                        score -= isPersonal ? 10 : 50;
-                    } else if (localHour >= 9 && localHour < 12) {
-                        score += 10; // Morning working hours - always good
-                    } else if (localHour >= 14 && localHour < 17) {
-                        score += 10; // Afternoon working hours - always good
-                    } else if (localHour === 12 || localHour === 13) {
-                        score += 3; // Lunch time (acceptable)
-                    } else if (localHour >= 8 && localHour < 9) {
-                        score += 1; // Early morning (less ideal)
-                    } else if (localHour >= 17 && localHour < 19) {
-                        // Early evening - more acceptable for personal
-                        score += isPersonal ? 6 : 1;
-                    } else if (localHour >= 19 && localHour < 22) {
-                        // Late evening (7 PM - 10 PM) - acceptable for personal, bad for official
-                        score += isPersonal ? 4 : -15;
+                    // Optimized scoring system based on meeting purpose
+                    if (isPersonal) {
+                        // PERSONAL MEETINGS: Primary concern is sleeping time (11 PM - 7 AM)
+                        // Weekends are completely available except for sleeping hours
+                        
+                        // Sleeping hours (11 PM - 7 AM) - Major concern for personal meetings
+                        if (localHour >= 23 || localHour < 7) {
+                            score -= 30; // Strong penalty for sleeping hours
+                        }
+                        // Morning hours (7 AM - 11 AM) - Great for personal
+                        else if (localHour >= 7 && localHour < 11) {
+                            score += 10;
+                        }
+                        // Mid-day (11 AM - 2 PM) - Excellent for personal
+                        else if (localHour >= 11 && localHour < 14) {
+                            score += 12;
+                        }
+                        // Afternoon (2 PM - 6 PM) - Great for personal
+                        else if (localHour >= 14 && localHour < 18) {
+                            score += 10;
+                        }
+                        // Evening (6 PM - 11 PM) - Good for personal, people are usually free
+                        else if (localHour >= 18 && localHour < 23) {
+                            score += 8;
+                        }
+                        
+                        // Weekend bonus for personal meetings - weekends are preferred
+                        if (isWeekend && localHour >= 7 && localHour < 23) {
+                            score += 5; // Bonus points for weekend slots (outside sleeping hours)
+                        }
                     } else {
-                        // Night hours (10 PM - 8 AM) - always bad, but less severe for personal
-                        score -= isPersonal ? 10 : 20;
+                        // OFFICE MEETINGS: Strict business hours (9 AM - 5 PM)
+                        // Lunch break consideration (12 PM - 1 PM)
+                        
+                        // Weekend penalty for office meetings
+                        if (isWeekend) {
+                            score -= 60; // Strong penalty for weekend office meetings
+                        }
+                        
+                        // Core business hours (9 AM - 12 PM, 2 PM - 5 PM) - Ideal
+                        if (localHour >= 9 && localHour < 12) {
+                            score += 15; // Prime morning working hours
+                        } else if (localHour >= 14 && localHour < 17) {
+                            score += 15; // Prime afternoon working hours
+                        }
+                        // Lunch time (12 PM - 2 PM) - Acceptable but not ideal
+                        else if (localHour >= 12 && localHour < 14) {
+                            score += 5; // Lunch break - possible but not optimal
+                        }
+                        // Early/late business hours (8-9 AM, 5-6 PM) - Less ideal but acceptable
+                        else if (localHour === 8 || localHour === 17) {
+                            score += 3; // Edge of business hours
+                        }
+                        // Very early/late (7-8 AM, 6-7 PM) - Poor
+                        else if (localHour === 7 || localHour === 18) {
+                            score -= 5; // Outside normal business hours
+                        }
+                        // Evening/Night (7 PM - 7 AM) - Unacceptable for office
+                        else if (localHour >= 19 || localHour < 7) {
+                            score -= 25; // Strong penalty for non-business hours
+                        }
                     }
 
                     details.push({
