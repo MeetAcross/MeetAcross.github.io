@@ -805,7 +805,7 @@
         </div>
         
         <!-- Keyboard Shortcuts Help -->
-        <div class="fixed bottom-4 right-4 no-print">
+        <div class="fixed bottom-4 right-24 no-print">
             <button 
                 onclick="toggleShortcutsHelp()" 
                 class="bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-700 transition shadow-lg"
@@ -2290,6 +2290,8 @@
             const selectDropdown = document.getElementById('selectedTime');
 
             selectDropdown.innerHTML = '<option value="">Choose a recommended time</option>';
+            // Add "Any Time" option as a new feature
+            selectDropdown.innerHTML += `<option value="any-time">⚡ Any Time - Schedule without time constraints</option>`;
 
             if (bestMeetingWindows.length === 0) {
                 list.innerHTML = '<p class="text-gray-500">No suitable meeting times found</p>';
@@ -2430,8 +2432,7 @@
             }
 
             const duration = parseInt(document.getElementById('meetingDuration').value);
-            const startDate = new Date(selectedTime);
-            const endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+            const { startDate, endDate } = getStartAndEndDates(selectedTime, duration);
 
             const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
             googleCalendarUrl.searchParams.append('action', 'TEMPLATE');
@@ -2454,6 +2455,22 @@
                 attendees: attendees.map(a => ({ name: a.name, timezone: a.timezone })),
                 selectedTime: selectedTime
             });
+        }
+
+        // Helper function to handle "Any Time" selection
+        function getStartAndEndDates(selectedTime, duration) {
+            let startDate, endDate;
+            if (selectedTime === 'any-time') {
+                const meetingDate = document.getElementById('meetingDate').value;
+                // Use 9 AM UTC on the selected date as default for "any-time"
+                startDate = new Date(meetingDate + 'T09:00:00Z');
+                endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+                showToast('Using default time (9:00 AM UTC) for "Any Time" selection', 'info');
+            } else {
+                startDate = new Date(selectedTime);
+                endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+            }
+            return { startDate, endDate };
         }
 
         // Format date for Google Calendar
@@ -2480,8 +2497,7 @@
             }
 
             const duration = parseInt(document.getElementById('meetingDuration').value);
-            const startDate = new Date(selectedTime);
-            const endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+            const { startDate, endDate } = getStartAndEndDates(selectedTime, duration);
 
             const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -2938,8 +2954,7 @@ END:VCALENDAR`;
             }
 
             const duration = parseInt(document.getElementById('meetingDuration').value);
-            const startDate = new Date(selectedTime);
-            const endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+            const { startDate, endDate } = getStartAndEndDates(selectedTime, duration);
 
             const organizerName = document.getElementById('organizerName').value.trim();
             const organizerEmail = document.getElementById('organizerEmail').value.trim();
@@ -3123,8 +3138,7 @@ END:VCALENDAR`;
             }
 
             const duration = parseInt(document.getElementById('meetingDuration').value);
-            const startDate = new Date(selectedTime);
-            const endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+            const { startDate, endDate } = getStartAndEndDates(selectedTime, duration);
 
             const organizerName = document.getElementById('organizerName').value.trim();
             const organizerEmail = document.getElementById('organizerEmail').value.trim();
@@ -3302,7 +3316,7 @@ END:VCALENDAR`;
             }
 
             const duration = parseInt(document.getElementById('meetingDuration').value);
-            const startDate = new Date(selectedTime);
+            const { startDate } = getStartAndEndDates(selectedTime, duration);
 
             const organizerName = document.getElementById('organizerName').value.trim();
             const organizerEmail = document.getElementById('organizerEmail').value.trim();
